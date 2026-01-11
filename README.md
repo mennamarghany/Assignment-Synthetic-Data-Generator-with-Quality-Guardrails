@@ -5,6 +5,7 @@ A robust, multi-provider synthetic data generation pipeline designed to create r
 ## 🏗️ Architecture
 This system implements a **Hybrid Cloud Architecture** to bypass local hardware constraints. It routes requests between Google (Gemini 2.5) and Groq (Llama 3) based on availability and rate limits.
 
+
 ```mermaid
 graph TD
     A[Config (YAML)] --> B{Provider Router}
@@ -18,6 +19,8 @@ graph TD
     G --> I[CSV & Analytics]
 
 ```
+
+
 
 ## 🚀 Key Features
 
