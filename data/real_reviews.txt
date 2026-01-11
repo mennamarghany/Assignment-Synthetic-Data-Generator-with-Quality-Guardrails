@@ -1,0 +1,8 @@
+[REAL REVIEW 1 - Source: G2/Public Web]
+"Honestly, the latency spikes are killing us. We tried to scale to 10M vectors and the p99 shot up to 200ms. Support is responsive but they just tell us to upgrade to the enterprise tier. Good for prototypes, bad for prod."
+
+[REAL REVIEW 2 - Source: Reddit/Public Web]
+"I love the python sdk, super intuitive. Set up my embeddings in like 10 mins. But man, the billing is confusing. I got hit with a $500 bill just for metadata filtering ops??"
+
+[REAL REVIEW 3 - Source: Capterra/Public Web]
+"Documentation is a mess. Links are broken and the tutorial code is deprecated. The tech is cool but the DX is frustrating."
