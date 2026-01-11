@@ -1,5 +1,12 @@
 # Assignment-Synthetic-Data-Generator-with-Quality-Guardrails
 
+You should replace the **entire content** of your `README.md` file with the code block below. This single block combines everything: the professional "Senior Engineer" architecture/postmortem sections and your specific instructions for running the quality tools.
+
+**Copy everything inside this box and paste it into `README.md`:**
+
+```markdown
+# 🧬 Synthetic Data Generator (with Quality Guardrails)
+
 A robust, multi-provider synthetic data generation pipeline designed to create realistic SaaS reviews for Vector Databases.
 
 ## 🏗️ Architecture
@@ -17,9 +24,60 @@ graph TD
     F -->|Duplicate?| H[Reject & Retry]
     G --> I[CSV & Analytics]
 
-🚀 Key FeaturesMulti-Model Strategy: Automatically balances load between Gemini 2.5 Flash and Llama 3 70B to ensure diversity.Resilient Engineering: Implements an "Exponential Backoff & Switch" algorithm. If Google's API hits the 15 RPM rate limit (429 RESOURCE_EXHAUSTED), the system automatically detects the crash and switches to Groq.Quality Guardrails:Diversity: Jaccard Similarity check (Threshold: 0.6) prevents semantic duplicates.Bias Detection: Automated scripts to analyze sentiment skew.📊 Metrics & Trade-offsMetricValueNoteThroughput~20 reviews/minThrottled by Free Tier Rate LimitsCost$0.00Leveraging Free Tier & Open Source ModelsDiversity0.82 (Jaccard)High lexical diversity achieved via Temperature=0.7Rejection Rate~4%Percentage of generated samples rejected by Guardrails🛠️ Postmortem: The "Rate Limit" IncidentWhat Broke:Initially, the system attempted to generate 500 samples using strictly Gemini 1.5 Flash. This immediately triggered Google's 429 Rate Limit (15 RPM), causing an infinite crash loop.How I Fixed It:Architecture Change: Decoupled the generator from a single provider.Fallback Logic: Implemented a state-machine that tracks attempts. If Attempt N fails on Google, Attempt N+1 is forced to Groq.Result: Successfully generated 500 valid samples with zero manual intervention.💻 Quick Start & Quality Assurance1. GenerationRun the robust generator (handles API limits automatically):Bashpip install -r requirements.txt
+```
+
+## 🚀 Key Features
+
+* **Multi-Model Strategy:** Automatically balances load between **Gemini 2.5 Flash** and **Llama 3 70B** to ensure diversity.
+* **Resilient Engineering:** Implements an "Exponential Backoff & Switch" algorithm. If Google's API hits the 15 RPM rate limit (`429 RESOURCE_EXHAUSTED`), the system automatically detects the crash and switches to Groq.
+* **Quality Guardrails:**
+* **Diversity:** Jaccard Similarity check (Threshold: 0.6) prevents semantic duplicates.
+* **Bias Detection:** Automated scripts to analyze sentiment skew.
+
+
+
+## 📊 Metrics & Trade-offs
+
+| Metric | Value | Note |
+| --- | --- | --- |
+| **Throughput** | ~20 reviews/min | Throttled by Free Tier Rate Limits |
+| **Cost** | **$0.00** | Leveraging Free Tier & Open Source Models |
+| **Diversity** | 0.82 (Jaccard) | High lexical diversity achieved via Temperature=0.7 |
+| **Rejection Rate** | ~4% | Percentage of generated samples rejected by Guardrails |
+
+## 🛠️ Postmortem: The "Rate Limit" Incident
+
+**What Broke:**
+Initially, the system attempted to generate 500 samples using strictly Gemini 1.5 Flash. This immediately triggered Google's `429` Rate Limit (15 RPM), causing an infinite crash loop.
+
+**How I Fixed It:**
+
+1. **Architecture Change:** Decoupled the generator from a single provider.
+2. **Fallback Logic:** Implemented a state-machine that tracks attempts. If `Attempt N` fails on Google, `Attempt N+1` is forced to Groq.
+3. **Result:** Successfully generated 500 valid samples with zero manual intervention.
+
+## 💻 Quick Start & Quality Assurance
+
+**1. Generation**
+Run the robust generator (handles API limits automatically):
+
+```bash
+pip install -r requirements.txt
 python main.py
 
-2. 📊 Quality Assurance (Automated Tools)This project includes automated tools to validate data quality. Run the audit script to check for sentiment skew and length outliers:Bashpython src/analytics.py
+```
 
-3. Quality ReportSee QUALITY_REPORT.md for a detailed comparison against real-world data and performance metrics.
+**2. 📊 Quality Assurance (Automated Tools)**
+This project includes automated tools to validate data quality. Run the audit script to check for sentiment skew and length outliers:
+
+```bash
+python src/analytics.py
+
+```
+
+**3. Quality Report**
+See `QUALITY_REPORT.md` for a detailed comparison against real-world data and performance metrics.
+
+```
+
+```
