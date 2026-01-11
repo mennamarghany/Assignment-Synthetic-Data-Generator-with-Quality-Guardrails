@@ -1,0 +1,31 @@
+project_name: "VectorDB_Sentinel"
+domain: "Vector Database SaaS (like Pinecone/Weaviate)"
+
+generation:
+  target_count: 500
+  batch_size: 5  # Small batch size for safety
+
+distribution:
+  1_star: 0.10
+  2_star: 0.05
+  3_star: 0.15
+  4_star: 0.20
+  5_star: 0.50
+
+personas:
+  - role: "Senior MLOps Engineer"
+    tone: "Professional, critical of latency, focused on production stability"
+    keywords: ["p99 latency", "throughput", "production", "downtime", "upsert"]
+  
+  - role: "Startup CTO"
+    tone: "Impressed by speed but worried about billing/costs"
+    keywords: ["pricing tier", "scale", "cost optimization", "bill", "metadata filtering"]
+  
+  - role: "Junior Data Scientist"
+    tone: "Enthusiastic, focused on ease of use and documentation"
+    keywords: ["docs", "tutorial", "python sdk", "easy to set up", "embeddings"]
+
+quality_gate:
+  min_word_count: 80
+  max_word_count: 200
+  max_similarity_threshold: 0.85

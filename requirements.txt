@@ -1,0 +1,12 @@
+langchain-google-genai
+langchain-ollama
+langchain
+langchain-community
+pydantic
+faiss-cpu
+sentence-transformers
+pandas
+python-dotenv
+pyyaml
+typer
+rich
