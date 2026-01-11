@@ -1,99 +1,85 @@
 import os
-import time
-from typing import List
+import json
+from google import genai  # NEW SDK IMPORT
+from groq import Groq
 from dotenv import load_dotenv
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import PydanticOutputParser
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_ollama import ChatOllama
-from .schema import ReviewBatch
 
 load_dotenv()
 
 class ReviewGenerator:
-    def __init__(self, provider: str = "ollama"):
-        """
-        Initialize with Hybrid Edge-Cloud providers.
-        """
+    def __init__(self, provider: str = "google"):
         self.provider = provider
-        self.parser = PydanticOutputParser(pydantic_object=ReviewBatch)
         
-        # Strategy: Hybrid Architecture
-        if provider == "ollama":
-            # Edge AI: Runs locally on CPU/GPU (Private, Free)
-            # base_url is needed if running in a container/codespace sometimes, 
-            # but usually defaults work.
-            self.llm = ChatOllama(
-                model="llama3",
-                temperature=0.7,
-                # Optional: keep_alive keeps the model loaded for speed
-                keep_alive="5m" 
-            )
-        elif provider == "gemini":
-            # Cloud AI: Runs on Google's TPU Pods (Fast, Scalable)
-            api_key = os.getenv("GOOGLE_API_KEY")
-            if not api_key:
-                raise ValueError("Missing GOOGLE_API_KEY in .env")
+        if provider == "google":
+            # Uses the NEW Gemini 2.5 Flash model
+            api_key = os.getenv("GOOGLE_API_KEY") 
+            if not api_key: raise ValueError("Missing GOOGLE_API_KEY")
             
-            self.llm = ChatGoogleGenerativeAI(
-                model="gemini-1.5-flash", # Flash is optimized for high-volume tasks
-                temperature=0.7,
-                google_api_key=api_key,
-                convert_system_message_to_human=True # Helper for Gemini quirks
-            )
-        else:
-            raise ValueError(f"Unsupported provider: {provider}")
+            # New Client Initialization
+            self.client = genai.Client(api_key=api_key)
+            self.model_name = "gemini-2.5-flash"
+            
+        elif provider == "groq":
+            # Uses Llama 3 on Groq
+            api_key = os.getenv("GROQ_API_KEY")
+            if not api_key: raise ValueError("Missing GROQ_API_KEY")
+            
+            self.client = Groq(api_key=api_key)
+            self.model_name = "llama-3.1-8b-instant" 
 
-    def generate_batch(self, count: int, persona: dict, rating: int) -> List[dict]:
-        """
-        Generates reviews using the selected provider.
-        """
-        # System prompt engineered for technical accuracy
-        system_template = """
-        You are an expert synthetic data generator for a Vector Database SaaS product.
-        Generate {count} distinct user reviews matching:
+    def generate_batch(self, count: int, persona: dict, rating: int) -> list:
+        # Prompt designed to return raw JSON
+        prompt = f"""
+        Act as a synthetic data generator.
+        Task: Write {count} reviews for a Vector DB SaaS.
+        Persona: {persona['role']} ({persona['tone']})
+        Rating: {rating}/5 Stars
+        Keywords: {', '.join(persona['keywords'])}
         
-        ROLE: {role}
-        TONE: {tone}
-        RATING: {rating}/5 stars
-        KEYWORDS: {keywords}
-        
-        CRITICAL INSTRUCTIONS:
-        1. Be specific. Use the keywords naturally in technical sentences.
-        2. Vary the length. Some short, some long.
-        3. OUTPUT PURE JSON ONLY matching the requested schema.
-        
-        {format_instructions}
+        Output Requirement:
+        Return ONLY a raw JSON list of objects. No markdown formatting.
+        Each object must have: "persona_role", "rating", "title", "content", "pros", "cons".
         """
         
-        prompt = ChatPromptTemplate.from_template(system_template)
-        
-        messages = prompt.format_messages(
-            count=count,
-            role=persona['role'],
-            tone=persona['tone'],
-            keywords=", ".join(persona['keywords']),
-            rating=rating,
-            format_instructions=self.parser.get_format_instructions()
-        )
-
         try:
-            print(f"   [Generating] asking {self.provider}...")
-            response = self.llm.invoke(messages)
+            text_response = ""
             
-            # Parse the result
-            parsed_result = self.parser.parse(response.content)
-            
-            # Tag the data with the provider name for the final analytics report
-            results = []
-            for review in parsed_result.reviews:
-                r_dict = review.dict()
-                r_dict['provider'] = self.provider.upper()
-                results.append(r_dict)
+            # --- GOOGLE GEMINI 2.5 LOGIC ---
+            if self.provider == "google":
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=prompt
+                )
+                text_response = response.text
                 
-            return results
+            # --- GROQ LLAMA 3 LOGIC ---
+            elif self.provider == "groq":
+                chat_completion = self.client.chat.completions.create(
+                    messages=[{"role": "user", "content": prompt}],
+                    model=self.model_name,
+                    temperature=0.7
+                )
+                text_response = chat_completion.choices[0].message.content
+
+            # --- COMMON CLEANUP ---
+            # Remove ```json and ``` markers if the model adds them
+            clean_text = text_response.replace("```json", "").replace("```", "").strip()
             
+            # Find the JSON list brackets [ ... ]
+            start = clean_text.find('[')
+            end = clean_text.rfind(']') + 1
+            if start != -1 and end != -1:
+                clean_text = clean_text[start:end]
+                
+            data = json.loads(clean_text)
+            
+            # Tag the data with the provider name
+            for item in data:
+                item['provider'] = self.provider.upper()
+                item['valid'] = True 
+                
+            return data
+
         except Exception as e:
             print(f"   [Error] {self.provider} failed: {e}")
-            # Senior Engineering: Fail gracefully by returning empty list (Supervisor will retry)
             return []

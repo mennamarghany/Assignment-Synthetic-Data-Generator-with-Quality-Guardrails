@@ -1,10 +1,10 @@
-langchain-google-genai
-langchain-ollama
-langchain
-langchain-community
-pydantic
-faiss-cpu
-sentence-transformers
+# NEW Google SDK
+google-genai
+
+# Groq SDK
+groq
+
+# Utilities
 pandas
 python-dotenv
 pyyaml
