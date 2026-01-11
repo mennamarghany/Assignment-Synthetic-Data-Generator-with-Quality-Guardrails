@@ -4,7 +4,7 @@
 - **Total Samples Generated:** 500
 - **Domain:** Vector Database SaaS
 - **Primary Models:** Google Gemini 2.5 Flash, Meta Llama 3.1 8B (via Groq)
-- **Time to Generate:** ~25 minutes (due to API Rate Limit handling)
+- **Time to Generate:** ~15 minutes (due to API Rate Limit handling)
 
 ## 2. Engineering & Architecture
 We implemented a **Robust Provider Switcher** to handle production-grade constraints:
