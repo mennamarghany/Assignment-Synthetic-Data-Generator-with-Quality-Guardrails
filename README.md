@@ -8,16 +8,15 @@ This system implements a **Hybrid Cloud Architecture** to bypass local hardware 
 
 ```mermaid
 graph TD
-    A[Config (YAML)] --> B{Provider Router}
-    B -->|Primary| C[Google Gemini 2.5]
-    B -->|Fallback| D[Groq Llama 3]
-    C --> E[Raw JSON Output]
+    A["Config (YAML)"] --> B{"Provider Router"}
+    B -->|Primary| C["Google Gemini 2.5"]
+    B -->|Fallback| D["Groq Llama 3"]
+    C --> E["Raw JSON Output"]
     D --> E
-    E --> F{Quality Guardrails}
-    F -->|Diverse?| G[Add to Dataset]
-    F -->|Duplicate?| H[Reject & Retry]
-    G --> I[CSV & Analytics]
-
+    E --> F{"Quality Guardrails"}
+    F -->|Diverse?| G["Add to Dataset"]
+    F -->|Duplicate?| H["Reject & Retry"]
+    G --> I["CSV & Analytics"]
 ```
 
 
