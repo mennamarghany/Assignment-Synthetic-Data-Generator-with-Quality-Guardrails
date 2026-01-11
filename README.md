@@ -1,12 +1,5 @@
 # Assignment-Synthetic-Data-Generator-with-Quality-Guardrails
 
-You should replace the **entire content** of your `README.md` file with the code block below. This single block combines everything: the professional "Senior Engineer" architecture/postmortem sections and your specific instructions for running the quality tools.
-
-**Copy everything inside this box and paste it into `README.md`:**
-
-```markdown
-# 🧬 Synthetic Data Generator (with Quality Guardrails)
-
 A robust, multi-provider synthetic data generation pipeline designed to create realistic SaaS reviews for Vector Databases.
 
 ## 🏗️ Architecture
